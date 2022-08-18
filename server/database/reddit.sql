@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Авг 18 2022 г., 08:46
+-- Время создания: Авг 18 2022 г., 19:40
 -- Версия сервера: 8.0.30-0ubuntu0.20.04.2
 -- Версия PHP: 7.4.3
 
@@ -65,15 +65,19 @@ BEGIN
      
      JSON_OBJECT(
          
-     'all_count', COUNT(message_reward.message_id),
+     	'all_count', COUNT(message_reward.message_id),
          
-     'reward', message_reward.reward
+     	'reward', message_reward.reward
          
      ) quantity
      
      FROM message_reward
      
-     GROUP BY message_reward.message_id, message_reward.reward)
+     GROUP BY
+     
+     	message_reward.message_id, 
+     	
+     	message_reward.reward)
     
     	message_reward
     
@@ -478,7 +482,7 @@ ALTER TABLE `group_reddit`
 -- AUTO_INCREMENT для таблицы `n_message`
 --
 ALTER TABLE `n_message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `post`
