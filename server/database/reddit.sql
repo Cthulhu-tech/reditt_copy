@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.5deb2
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Хост: localhost:3306
--- Время создания: Авг 18 2022 г., 19:40
--- Версия сервера: 8.0.30-0ubuntu0.20.04.2
--- Версия PHP: 7.4.3
+-- Хост: 127.0.0.1:3306
+-- Время создания: Авг 19 2022 г., 20:02
+-- Версия сервера: 8.0.19
+-- Версия PHP: 7.4.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -26,7 +25,7 @@ DELIMITER $$
 --
 -- Процедуры
 --
-CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
+CREATE DEFINER=`root`@`127.0.0.1` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
 BEGIN
 
 	SELECT 
@@ -41,7 +40,10 @@ BEGIN
         
     	GROUP_CONCAT(DISTINCT n_message.n_message) next_message,
         
-        JSON_ARRAYAGG(message_reward.quantity) reward
+       	IF(
+            COUNT(message_reward.quantity) = 0, NULL,        
+        	JSON_ARRAYAGG(message_reward.quantity)
+        )	reward
         
     FROM post_message
     
@@ -63,13 +65,13 @@ BEGIN
      
      message_reward.message_id message_id,
      
-     JSON_OBJECT(
+     	JSON_OBJECT(
          
-     	'all_count', COUNT(message_reward.message_id),
+     		'all_count', COUNT(message_reward.message_id),
          
-     	'reward', message_reward.reward
-         
-     ) quantity
+     		'reward', message_reward.reward
+            
+     )	quantity
      
      FROM message_reward
      
@@ -482,7 +484,7 @@ ALTER TABLE `group_reddit`
 -- AUTO_INCREMENT для таблицы `n_message`
 --
 ALTER TABLE `n_message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `post`
