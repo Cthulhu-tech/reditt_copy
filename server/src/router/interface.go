@@ -8,7 +8,7 @@ type PostData struct {
 	Message    sql.NullString `json:"message"`
 	Prev       sql.NullInt64  `json:"prev_message"`
 	Next       sql.NullInt64  `json:"next_message"`
-	Reward     []byte `json:"reward"`
+	Reward     sql.NullString   `json:"reward"`
 }
 
 type PostDataConvert struct {

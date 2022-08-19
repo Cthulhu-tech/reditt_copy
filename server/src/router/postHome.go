@@ -45,6 +45,22 @@ func postHome(w http.ResponseWriter, r *http.Request) {
 		convertPostData.Prev = post.Prev.Int64
 		convertPostData.Next = post.Next.Int64
 
+		var reward []Reward
+
+		if post.Reward.Valid {
+
+			err := json.Unmarshal([]byte(post.Reward.String), &reward)
+
+			if err != nil {
+
+				log.Print(err.Error())
+
+			}
+
+			convertPostData.Reward = reward
+
+		}
+
 		posts = append(posts, convertPostData)
 
 	}
@@ -55,7 +71,7 @@ func postHome(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	db.Close()
+	defer rows.Close()
 
 	w.Header().Set("Content-Type", "application/json")
 
