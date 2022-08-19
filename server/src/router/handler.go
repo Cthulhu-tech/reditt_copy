@@ -25,6 +25,7 @@ func HandlerRouter() {
 
 	router.HandleFunc("/login", login)
 	router.HandleFunc("/lagout", lagout)
+	router.HandleFunc("/refresh", refresh)
 	router.HandleFunc("/registration", registration)
 
 	router.HandleFunc("/post/{id:[0-9]+}", postNumber)
