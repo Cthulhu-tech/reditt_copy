@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 
 	response := fmt.Sprintf("login")
 

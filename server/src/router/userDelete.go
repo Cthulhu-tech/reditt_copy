@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func UserDelete(w http.ResponseWriter, r *http.Request) {
+func userDelete(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 

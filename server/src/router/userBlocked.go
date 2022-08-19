@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func UserBlocked(w http.ResponseWriter, r *http.Request) {
+func userBlocked(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 

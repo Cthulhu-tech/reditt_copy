@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Lagout(w http.ResponseWriter, r *http.Request) {
+func lagout(w http.ResponseWriter, r *http.Request) {
 
 	response := fmt.Sprintf("lagout")
 

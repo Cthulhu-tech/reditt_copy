@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func UserHidden(w http.ResponseWriter, r *http.Request) {
+func userHidden(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 

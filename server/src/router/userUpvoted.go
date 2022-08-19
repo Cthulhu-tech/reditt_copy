@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func UserUpvoted(w http.ResponseWriter, r *http.Request) {
+func userUpvoted(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 

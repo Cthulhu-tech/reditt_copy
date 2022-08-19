@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func UserGilded(w http.ResponseWriter, r *http.Request) {
+func userGilded(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
