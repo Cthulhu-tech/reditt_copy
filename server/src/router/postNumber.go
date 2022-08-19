@@ -1,9 +1,11 @@
 package routerHandler
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"net/http"
 
+	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 	"github.com/gorilla/mux"
 )
 
@@ -13,8 +15,68 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 
 	id := vars["id"]
 
-	response := fmt.Sprintf("post №%s", id)
+	var db = mysql.GetDB()
 
-	fmt.Fprint(w, response)
+	rows, err := db.Query("CALL sp_get_all_message_in_post(?)", id)
+
+	if err != nil {
+
+		panic(err.Error())
+
+	}
+
+	posts := []PostDataConvert{}
+
+	for rows.Next() {
+
+		var post PostData
+
+		if err := rows.Scan(&post.Message_ID, &post.User, &post.Message, &post.Prev, &post.Next, &post.Reward); err != nil {
+
+			log.Println(err.Error())
+
+		}
+
+		var convertPostData PostDataConvert
+
+		convertPostData.Message_ID = post.Message_ID
+		convertPostData.User = post.User
+		convertPostData.Message = post.Message.String
+		convertPostData.Prev = post.Prev.Int64
+		convertPostData.Next = post.Next.Int64
+
+		var reward []Reward
+
+		if post.Reward.Valid {
+
+			err := json.Unmarshal([]byte(post.Reward.String), &reward)
+
+			if err != nil {
+
+				log.Print(err.Error())
+
+			}
+
+			convertPostData.Reward = reward
+
+		}
+
+		posts = append(posts, convertPostData)
+
+	}
+
+	if err != nil {
+
+		log.Println(err.Error())
+
+	}
+
+	defer rows.Close()
+
+	w.Header().Set("Content-Type", "application/json")
+
+	_posts, _ := json.Marshal(posts)
+
+	w.Write(_posts)
 
 }
