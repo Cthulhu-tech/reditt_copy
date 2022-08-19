@@ -13,7 +13,7 @@ var (db *sql.DB)
 
 func MysqlConnectPool() {
 
-	database, err := sql.Open("mysql", os.Getenv("USERNAME")+":"+os.Getenv("PASSWORD")+"@tcp("+os.Getenv("SERVER")+os.Getenv("PORT")+")/"+os.Getenv("DBNAME"))
+	database, err := sql.Open("mysql", os.Getenv("USERDB")+":"+os.Getenv("PASSWORD")+"@tcp("+os.Getenv("SERVER")+os.Getenv("PORT")+")/"+os.Getenv("DBNAME"))
 	
 	if err != nil {
 
