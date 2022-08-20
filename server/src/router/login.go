@@ -42,14 +42,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,min=2")
+	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,min=2,max=20,regexp=^[A-Za-z0-9][A-Za-z0-9_]{0,18}$")
 
 	if err != nil {
 		ErrorHandler(w, "Need login or password", 400)
 		return
 	}
 
-	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4")
+	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4,regexp=^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-zа-яА-ЯЙЁеё\\d@$!%*?&]{8,}$")
 
 	if err != nil {
 		ErrorHandler(w, "Need login or password", 400)
