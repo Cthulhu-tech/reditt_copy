@@ -8,11 +8,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func CreateJWT(duration int) (string, error) {
+func CreateJWT(duration int, user string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
+
+	claims["user"] = user
 
 	claims["iat"] = time.Now().Unix()
 
