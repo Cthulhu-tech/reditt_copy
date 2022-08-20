@@ -32,6 +32,12 @@ type BodyDataLogin struct {
 	Password string `json:"password"`
 }
 
+type BodyDataRegistration struct {
+	Login    string `json:"login"`
+	Mail 	 string `json:"mail"`
+	Password string `json:"password"`
+}
+
 type User struct {
 	Id        sql.NullInt64  `json:"id"`
 	Login     sql.NullString `json:"login"`
@@ -39,4 +45,16 @@ type User struct {
 	Create    sql.NullString `json:"create_date"`
 	Confirmed sql.NullInt64  `json:"confirm"`
 	Mail      sql.NullString `json:"mail"`
+}
+
+type CountUsers struct {
+
+	Count int64 `json:"count"`
+
+}
+
+type UserCreate struct {
+
+	Message string
+
 }
