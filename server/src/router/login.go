@@ -94,7 +94,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		var duration = 168
 
-		refreshToken, err := jwt_server.CreateJWT(duration)
+		refreshToken, err := jwt_server.CreateJWT(duration, posts.Login.String)
 
 		if err != nil {
 			ErrorHandler(w, "Server Error", 500)

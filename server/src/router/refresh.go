@@ -11,7 +11,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 	var user = ""
 	var duration = 168
 
-	refreshToken, err := jwt_server.CreateJWT(duration)
+	refreshToken, err := jwt_server.CreateJWT(duration, "user")
 
 	if err != nil {
 		ErrorHandler(w, "Server Error", 500)
