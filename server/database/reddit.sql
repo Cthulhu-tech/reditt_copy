@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 4.9.5deb2
 -- https://www.phpmyadmin.net/
 --
--- Хост: 127.0.0.1:3306
--- Время создания: Авг 19 2022 г., 20:02
--- Версия сервера: 8.0.19
--- Версия PHP: 7.4.5
+-- Хост: localhost:3306
+-- Время создания: Авг 22 2022 г., 00:36
+-- Версия сервера: 8.0.30-0ubuntu0.20.04.2
+-- Версия PHP: 7.4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -25,7 +26,24 @@ DELIMITER $$
 --
 -- Процедуры
 --
-CREATE DEFINER=`root`@`127.0.0.1` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
+CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_find_user_in_login` (IN `value_login` VARCHAR(255))  NO SQL
+BEGIN
+
+	SELECT 
+    
+    	COUNT(*) count,
+        
+        user.id id
+    
+    FROM user
+    
+    WHERE login = value_login
+    
+    GROUP BY user.id;
+
+END$$
+
+CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
 BEGIN
 
 	SELECT 
@@ -323,18 +341,18 @@ CREATE TABLE `token` (
 CREATE TABLE `user` (
   `id` int NOT NULL,
   `login` char(55) NOT NULL,
-  `passsword` char(255) NOT NULL,
+  `password` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_date` timestamp NOT NULL,
   `confirm` tinyint(1) DEFAULT '0',
-  `mail` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `mail` char(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `login`, `passsword`, `create_date`, `confirm`, `mail`) VALUES
-(1, 'Admin', 'admin', '2022-08-18 01:20:03', 1, 'admin@mail.com');
+INSERT INTO `user` (`id`, `login`, `password`, `create_date`, `confirm`, `mail`) VALUES
+(1, 'Admin', '$2a$14$AFzvipzNrWUL7vfnvAt4suNUqEKb9rfTSoSADDWhhTYMM2iHt91C2', '2022-08-18 01:20:03', 1, 'admin@mail.com');
 
 -- --------------------------------------------------------
 
@@ -517,10 +535,16 @@ ALTER TABLE `rewards`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT для таблицы `token`
+--
+ALTER TABLE `token`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+
+--
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `user_message`
@@ -610,7 +634,7 @@ ALTER TABLE `rewards`
 -- Ограничения внешнего ключа таблицы `token`
 --
 ALTER TABLE `token`
-  ADD CONSTRAINT `token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `token_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `user_message`
