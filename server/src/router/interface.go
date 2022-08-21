@@ -53,6 +53,13 @@ type CountUsers struct {
 
 }
 
+type CountUsersId struct {
+
+	Count int64 `json:"count"`
+	Id 	  int64 `json:"id"`
+
+}
+
 type UserCreate struct {
 
 	Message string
