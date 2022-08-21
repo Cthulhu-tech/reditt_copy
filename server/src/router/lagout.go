@@ -1,14 +1,33 @@
 package routerHandler
 
 import (
-	"fmt"
 	"net/http"
+
+	jwt_server "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/jwt"
+	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 )
 
 func lagout(w http.ResponseWriter, r *http.Request) {
 
-	response := fmt.Sprintf("lagout")
+	db := mysql.GetDB()
 
-	fmt.Fprint(w, response)
+	_cookie, err := jwt_server.GetToken(r)
+
+	_, err = db.Query("DELETE FROM token WHERE token = ?", _cookie.Value)
+
+	if err != nil {
+		ErrorHandler(w, "Server Error", 500)
+		return
+	}
+
+	cookie := &http.Cookie{
+		Name:     "refresh",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, cookie)
 
 }
