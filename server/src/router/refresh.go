@@ -81,4 +81,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	ErrorHandler(w, "Cookie not found", 403)
+	return
+
 }
