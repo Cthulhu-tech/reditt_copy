@@ -34,7 +34,7 @@ type BodyDataLogin struct {
 
 type BodyDataRegistration struct {
 	Login    string `json:"login"`
-	Mail 	 string `json:"mail"`
+	Mail     string `json:"mail"`
 	Password string `json:"password"`
 }
 
@@ -48,20 +48,18 @@ type User struct {
 }
 
 type CountUsers struct {
-
 	Count int64 `json:"count"`
-
 }
 
 type CountUsersId struct {
-
 	Count int64 `json:"count"`
-	Id 	  int64 `json:"id"`
-
+	Id    int64 `json:"id"`
 }
 
 type UserCreate struct {
-
 	Message string
+}
 
+type MessageError struct {
+	Error string
 }
