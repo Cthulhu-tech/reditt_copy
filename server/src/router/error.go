@@ -1,9 +1,18 @@
 package routerHandler
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+)
 
 func ErrorHandler(w http.ResponseWriter, _error string, _status int) {
 
-	http.Error(w, _error, _status)
+	var Message MessageError
+
+	Message.Error = _error
+
+	msg, _ := json.Marshal(Message)
+
+	http.Error(w, string(msg), _status)
 
 }
