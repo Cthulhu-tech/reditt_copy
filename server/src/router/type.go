@@ -63,3 +63,19 @@ type UserCreate struct {
 type MessageError struct {
 	Error string
 }
+
+type SubReddit struct {
+	Id          sql.NullInt64  `json:"id"`
+	Avatar      sql.NullString `json:"avatars"`
+	Title       sql.NullString `json:"title"`
+	Description sql.NullString `json:"description"`
+	Backround   sql.NullString `json:"backround"`
+}
+
+type SubRedditConvert struct {
+	Id          int64  `json:"id"`
+	Avatar      string `json:"avatars"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Backround   string `json:"backround"`
+}

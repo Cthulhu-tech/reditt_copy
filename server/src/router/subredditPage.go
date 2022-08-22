@@ -13,7 +13,9 @@ func subredditPage(w http.ResponseWriter, r *http.Request) {
 
 	page := vars["page"]
 
-	response := fmt.Sprintf("subredit page: %s", page)
+	name := vars["name"]
+
+	response := fmt.Sprintf("subredit page: %s, name: %s", page, name)
 
 	fmt.Fprint(w, response)
 

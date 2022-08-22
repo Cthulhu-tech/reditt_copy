@@ -47,8 +47,8 @@ func HandlerRouter() {
 
 	router.HandleFunc("/post/{id:[0-9]+}", postNumber).Methods("GET") // end
 
-	router.HandleFunc("/subreddit/{page:[0-9]+}", subredditPage).Methods("POST")
-	router.HandleFunc("/subreddit/{name:[a-zA-Z]+}", subredditName).Methods("POST")
+	router.HandleFunc("/subreddit/{name:[a-zA-Z_]+}", subredditName).Methods("GET")
+	router.HandleFunc("/subreddit/{name:[a-zA-Z_]+}/{page:[0-9]+}", subredditPage).Methods("GET")
 
 	handler := cors.New(cors.Options{
 		AllowCredentials: true,
