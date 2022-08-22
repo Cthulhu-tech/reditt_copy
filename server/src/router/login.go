@@ -60,6 +60,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := db.Query(`SELECT * FROM user WHERE login = ?`, userInfo.Login)
 
+	defer rows.Close()
+
 	if err != nil {
 		ErrorHandler(w, "Login or Password is not valid", 401)
 		return
@@ -85,8 +87,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 		posts.Mail = _user.Mail
 
 	}
-
-	rows.Close()
 
 	check := passwordHash.CheckPasswordHash(userInfo.Password, posts.Password.String)
 
