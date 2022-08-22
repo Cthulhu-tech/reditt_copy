@@ -27,10 +27,10 @@ func HandlerRouter() {
 	jwtHandler.HandleFunc("/submited/update", userPost.UserSubmited).Methods("POST")
 	jwtHandler.HandleFunc("/downvoted/update", userPost.UserDownvoted).Methods("POST")
 
-	router.HandleFunc("/login", login).Methods("POST")
-	router.HandleFunc("/lagout", lagout).Methods("POST")
-	router.HandleFunc("/refresh", refresh).Methods("POST")
-	router.HandleFunc("/registration", registration).Methods("POST")
+	router.HandleFunc("/login", login).Methods("POST")               // end
+	router.HandleFunc("/lagout", lagout).Methods("POST")             // end
+	router.HandleFunc("/refresh", refresh).Methods("POST")           // end
+	router.HandleFunc("/registration", registration).Methods("POST") // end
 
 	router.HandleFunc("/user/{login:[a-zA-Z]+}", userGet.User).Methods("GET")
 	router.HandleFunc("/user/{login:[a-zA-Z]+}/{page:[0-9]+}", userGet.UserPost).Methods("GET")
@@ -45,7 +45,7 @@ func HandlerRouter() {
 	router.HandleFunc("/user/{login:[a-zA-Z]+}/submited/{page:[0-9]+}", userGet.UserSubmited).Methods("GET")
 	router.HandleFunc("/user/{login:[a-zA-Z]+}/downvoted/{page:[0-9]+}", userGet.UserDownvoted).Methods("GET")
 
-	router.HandleFunc("/post/{id:[0-9]+}", postNumber).Methods("POST")
+	router.HandleFunc("/post/{id:[0-9]+}", postNumber).Methods("GET") // end
 
 	router.HandleFunc("/subreddit/{page:[0-9]+}", subredditPage).Methods("POST")
 	router.HandleFunc("/subreddit/{name:[a-zA-Z]+}", subredditName).Methods("POST")

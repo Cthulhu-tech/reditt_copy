@@ -7,7 +7,7 @@ export const useFetch = (method: string = 'POST') => {
     const [load, setLoad] = useState(true);
 
     const FetchData = (url: string, _body: {[key: string]: string} = {}) => {
-        console.log('f')
+
         let params: RequestInit = {
 
             method: method,
