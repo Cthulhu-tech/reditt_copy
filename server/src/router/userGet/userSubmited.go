@@ -1,4 +1,4 @@
-package routerHandler
+package userGet
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func userPost(w http.ResponseWriter, r *http.Request) {
+func UserSubmited(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -15,7 +15,7 @@ func userPost(w http.ResponseWriter, r *http.Request) {
 
 	login := vars["login"]
 
-	response := fmt.Sprintf("user login: %s, page: %s", login, page)
+	response := fmt.Sprintf("user login: %s, page: %s. submited", login, page)
 
 	fmt.Fprint(w, response)
 

@@ -38,21 +38,21 @@ func login(w http.ResponseWriter, r *http.Request) {
 	err = validate.Struct(userInfo)
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,max=18,min=2")
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
@@ -90,7 +90,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	check := passwordHash.CheckPasswordHash(userInfo.Password, posts.Password.String)
 
-	if posts.Login.Valid && posts.Password.Valid && posts.Login.String == userInfo.Login && check {
+	if posts.Login.Valid && posts.Password.Valid && posts.Login.String == userInfo.Login && check && posts.Confirmed.Int64 == 1 {
 
 		var duration = 168
 
@@ -106,6 +106,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 		jwt_server.SetRefreshToken(w, r, duration, refreshToken)
 		jwt_server.SetAccessToken(w, r, 1, posts.Login.String)
 
+		return
+
+	} else if check && posts.Confirmed.Int64 == 0 {
+
+		ErrorHandler(w, "Please confirm your account", 401)
 		return
 
 	} else {

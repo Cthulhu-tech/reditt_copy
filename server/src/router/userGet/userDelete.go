@@ -1,4 +1,4 @@
-package routerHandler
+package userGet
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func userUpvoted(w http.ResponseWriter, r *http.Request) {
+func UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -15,7 +15,7 @@ func userUpvoted(w http.ResponseWriter, r *http.Request) {
 
 	login := vars["login"]
 
-	response := fmt.Sprintf("user login: %s, page: %s. upvoted", login, page)
+	response := fmt.Sprintf("user login: %s, page: %s. delete", login, page)
 
 	fmt.Fprint(w, response)
 

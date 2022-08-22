@@ -1,4 +1,4 @@
-package routerHandler
+package userGet
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func user(w http.ResponseWriter, r *http.Request) {
+func User(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 

@@ -1,4 +1,4 @@
-package routerHandler
+package userGet
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func userBlocked(w http.ResponseWriter, r *http.Request) {
+func UserSaved(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -15,7 +15,7 @@ func userBlocked(w http.ResponseWriter, r *http.Request) {
 
 	login := vars["login"]
 
-	response := fmt.Sprintf("user login: %s, page: %s. blocked", login, page)
+	response := fmt.Sprintf("user login: %s, page: %s. saved", login, page)
 
 	fmt.Fprint(w, response)
 

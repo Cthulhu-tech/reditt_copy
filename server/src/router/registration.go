@@ -20,7 +20,7 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
@@ -29,7 +29,7 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &userInfo)
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
@@ -38,27 +38,27 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,max=18,min=2")
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password, mail", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password, mail", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Mail, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password, mail", 400)
+		ErrorHandler(w, "Please fill in all fields", 400)
 		return
 	}
 
 	var db = mysql.GetDB()
 
-	rows, err := db.Query(`SELECT COUNT(*) count FROM user WHERE login = ?`, userInfo.Login)
+	rows, err := db.Query(`SELECT COUNT(*) count FROM user WHERE login = ? or mail = ?`, userInfo.Login, userInfo.Mail)
 
 	defer rows.Close()
 
