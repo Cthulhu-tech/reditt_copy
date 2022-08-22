@@ -6,9 +6,10 @@ export const useFetch = (method: string = 'POST') => {
     const [errorResponse, setError] = useState<Error>();
     const [load, setLoad] = useState(true);
 
-    const FetchData = (url: string) => {
+    const FetchData = (url: string, _body: {[key: string]: string} = {}) => {
+        console.log('f')
+        let params: RequestInit = {
 
-        fetch(process.env.REACT_APP_SERVER + url, {
             method: method,
             mode: 'cors',
             redirect: 'follow',
@@ -16,18 +17,28 @@ export const useFetch = (method: string = 'POST') => {
             headers: {
                 'Content-type': 'application/json',
                 'Accept': 'application/json'
-            },
-        }).then((response) => {
+            }
+
+        }
+
+        if(Object.keys(_body).length > 0){
+
+            params.body = JSON.stringify(_body)
+
+        }
+
+        fetch(process.env.REACT_APP_SERVER + url, params)
+        .then((response) => {
 
             return response.json();
 
         }).then((json) => {
-
+            console.log(json)
             setLoad(false);
             return setData(json);
 
         }).catch((err) => {
-
+            console.log(err)
             setLoad(false);
             return setError(err);
 

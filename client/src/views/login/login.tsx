@@ -7,12 +7,12 @@ export const Login = () => {
 
     const responseData = () => {
 
-        FetchData('login')
+        FetchData('/login', dataForm)
 
     }
 
     const {load, data, errorResponse, FetchData} = useFetch();
-    const {handleInput, handleSubmit, error} = useForm(responseData, validate);
+    const {handleInput, handleSubmit, dataForm, error} = useForm(responseData, validate);
 
     useEffect(() => {}, [error])
 
@@ -27,6 +27,5 @@ export const Login = () => {
         {error?.password && <p>{error.password}</p>}
         <button type="submit">login</button>
     </form>
-
 
 }
