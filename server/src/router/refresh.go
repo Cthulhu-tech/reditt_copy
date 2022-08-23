@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/errorHandler"
 	jwt_server "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/jwt"
 	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 )
@@ -12,7 +13,16 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 
 	var duration = 168
 
-	find, user := jwt_server.CheckToken(r)
+	cookie, err := jwt_server.GetRefreshToken(r)
+
+	if err != nil {
+
+		serverError(w)
+
+		return
+	}
+
+	find, user := jwt_server.CheckToken(r, cookie.Value)
 
 	if find {
 
@@ -21,7 +31,9 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query("CALL `sp_find_user_in_login`(?)", user)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+
+			serverError(w)
+
 			return
 		}
 
@@ -43,36 +55,33 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if counts.Count == 0 {
-			ErrorHandler(w, "User not found", 403)
+			errorHTTP.ErrorHandler(w, "User not found", 403)
 			return
 		}
 
 		refreshToken, err := jwt_server.CreateJWT(duration, user)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
-		cookie, err := jwt_server.GetToken(r)
-
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
 		_, err = db.Query("DELETE FROM token WHERE token = ?", cookie.Value)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
 		_, err = db.Query("INSERT INTO token (user_id, token) VALUES (?, ?)", counts.Id, refreshToken)
 
 		if err != nil {
-
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
@@ -81,7 +90,7 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	ErrorHandler(w, "Cookie not found", 403)
+	errorHTTP.ErrorHandler(w, "Cookie not found", 403)
 	return
 
 }

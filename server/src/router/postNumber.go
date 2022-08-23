@@ -2,15 +2,18 @@ package routerHandler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
-	jwt_server "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/jwt"
 	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 )
 
 func postNumber(w http.ResponseWriter, r *http.Request) {
+
+	var user = " "
 
 	vars := mux.Vars(r)
 
@@ -18,19 +21,21 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 
 	var db = mysql.GetDB()
 
-	valid, user := jwt_server.CheckToken(r)
+	valueCtx, ok := context.GetOk(r, "username")
 
-	if !valid {
+	if ok {
 
-		user = ""
+		user = fmt.Sprintf("%v", valueCtx)
 
 	}
+
+	defer context.Clear(r)
 
 	rows, err := db.Query("CALL sp_get_all_message_in_post(?, ?)", id, user)
 
 	if err != nil {
 
-		panic(err.Error())
+		log.Printf(err.Error())
 
 	}
 

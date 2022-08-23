@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	errorHTTP "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/errorHandler"
 	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 	passwordHash "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/password"
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,7 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
@@ -29,7 +30,7 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &userInfo)
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
@@ -38,21 +39,21 @@ func registration(w http.ResponseWriter, r *http.Request) {
 	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,max=18,min=2")
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Mail, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
@@ -80,7 +81,7 @@ func registration(w http.ResponseWriter, r *http.Request) {
 
 	if counts.Count > 0 {
 
-		ErrorHandler(w, "Login or Mail is already in use", 401)
+		errorHTTP.ErrorHandler(w, "Login or Mail is already in use", 401)
 		return
 
 	} else {
@@ -88,14 +89,14 @@ func registration(w http.ResponseWriter, r *http.Request) {
 		hashPassword, err := passwordHash.HashPassword(userInfo.Password)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
 		_, err = db.Query(`INSERT INTO user (login, password, create_date, mail) VALUES (?, ?, ?, ?)`, userInfo.Login, hashPassword, time.Now(), userInfo.Mail)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 

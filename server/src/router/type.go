@@ -64,10 +64,6 @@ type UserCreate struct {
 	Message string
 }
 
-type MessageError struct {
-	Error string
-}
-
 type SubReddit struct {
 	Id          sql.NullInt64  `json:"id"`
 	Avatar      sql.NullString `json:"avatars"`

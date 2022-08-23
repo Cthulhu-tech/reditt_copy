@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	errorHTTP "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/errorHandler"
 	jwt_server "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/jwt"
 	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 	passwordHash "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/password"
@@ -20,7 +21,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		allFields(w)
 		return
 	}
 
@@ -29,7 +30,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &userInfo)
 
 	if err != nil {
-		ErrorHandler(w, "Need login or password", 400)
+		allFields(w)
 		return
 	}
 
@@ -38,21 +39,21 @@ func login(w http.ResponseWriter, r *http.Request) {
 	err = validate.Struct(userInfo)
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Login, " ", ""), "required,max=18,min=2")
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
 	err = validate.Var(strings.ReplaceAll(userInfo.Password, " ", ""), "required,min=4")
 
 	if err != nil {
-		ErrorHandler(w, "Please fill in all fields", 400)
+		allFields(w)
 		return
 	}
 
@@ -63,7 +64,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	if err != nil {
-		ErrorHandler(w, "Login or Password is not valid", 401)
+		errorHTTP.ErrorHandler(w, "Login or Password is not valid", 401)
 		return
 	}
 
@@ -97,7 +98,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		refreshToken, err := jwt_server.CreateJWT(duration, posts.Login.String)
 
 		if err != nil {
-			ErrorHandler(w, "Server Error", 500)
+			serverError(w)
 			return
 		}
 
@@ -110,12 +111,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	} else if check && posts.Confirmed.Int64 == 0 {
 
-		ErrorHandler(w, "Please confirm your account", 401)
+		errorHTTP.ErrorHandler(w, "Please confirm your account", 401)
 		return
 
 	} else {
 
-		ErrorHandler(w, "Login or Password is not valid", 401)
+		errorHTTP.ErrorHandler(w, "Login or Password is not valid", 401)
 		return
 
 	}
