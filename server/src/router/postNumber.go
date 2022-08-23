@@ -31,7 +31,7 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 
 		var post PostData
 
-		if err := rows.Scan(&post.Message_ID, &post.User, &post.Message, &post.Prev, &post.Next, &post.Reward); err != nil {
+		if err := rows.Scan(&post.Message_ID, &post.User, &post.Message, &post.Prev, &post.Next, &post.Reward, &post.Value); err != nil {
 
 			log.Println(err.Error())
 
@@ -42,6 +42,7 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 		convertPostData.Message_ID = post.Message_ID
 		convertPostData.User = post.User
 		convertPostData.Message = post.Message.String
+		convertPostData.Value = post.Value.Int64
 
 		var arrayNumber []int
 
