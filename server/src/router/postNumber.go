@@ -42,8 +42,36 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 		convertPostData.Message_ID = post.Message_ID
 		convertPostData.User = post.User
 		convertPostData.Message = post.Message.String
-		convertPostData.Prev = post.Prev.Int64
-		convertPostData.Next = post.Next.Int64
+
+		var arrayNumber []int
+
+		if post.Next.Valid {
+
+			err := json.Unmarshal([]byte(post.Next.String), &arrayNumber)
+
+			if err != nil {
+
+				log.Print(err.Error())
+
+			}
+
+			convertPostData.Next = arrayNumber
+
+		}
+
+		if post.Prev.Valid {
+
+			err := json.Unmarshal([]byte(post.Prev.String), &arrayNumber)
+
+			if err != nil {
+
+				log.Print(err.Error())
+
+			}
+
+			convertPostData.Prev = arrayNumber
+
+		}
 
 		var reward []Reward
 

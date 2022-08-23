@@ -5,20 +5,20 @@ import (
 )
 
 type PostData struct {
-	Message_ID int64          `json:"description"`
+	Message_ID int64          `json:"message_id"`
 	User       string         `json:"user"`
 	Message    sql.NullString `json:"message"`
-	Prev       sql.NullInt64  `json:"prev_message"`
-	Next       sql.NullInt64  `json:"next_message"`
+	Prev       sql.NullString `json:"prev_message"`
+	Next       sql.NullString `json:"next_message"`
 	Reward     sql.NullString `json:"reward"`
 }
 
 type PostDataConvert struct {
-	Message_ID int64    `json:"description"`
+	Message_ID int64    `json:"message_id"`
 	User       string   `json:"user"`
 	Message    string   `json:"message"`
-	Prev       int64    `json:"prev_message"`
-	Next       int64    `json:"next_message"`
+	Prev       []int    `json:"prev_message"`
+	Next       []int    `json:"next_message"`
 	Reward     []Reward `json:"reward"`
 }
 
