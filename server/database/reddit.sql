@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.5deb2
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Хост: localhost:3306
--- Время создания: Авг 22 2022 г., 00:36
--- Версия сервера: 8.0.30-0ubuntu0.20.04.2
--- Версия PHP: 7.4.3
+-- Хост: 127.0.0.1:3306
+-- Время создания: Авг 23 2022 г., 07:05
+-- Версия сервера: 8.0.19
+-- Версия PHP: 7.4.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -43,10 +42,10 @@ BEGIN
 
 END$$
 
-CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
+CREATE DEFINER=`root`@`127.0.0.1` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
 BEGIN
 
-	SELECT 
+	SELECT
     
     	post_message.id message_id,
         
@@ -54,13 +53,23 @@ BEGIN
         
     	post_message.message message,
         
-    	GROUP_CONCAT(DISTINCT p_message.p_message) prev_message,
+        CONCAT('[',
+        GROUP_CONCAT(DISTINCT p_message.p_message),
+        ']')
         
-    	GROUP_CONCAT(DISTINCT n_message.n_message) next_message,
+        prev_message,
         
+      	CONCAT('[',
+        GROUP_CONCAT(DISTINCT n_message.n_message),
+        ']')
+        
+        next_message,
+
        	IF(
-            COUNT(message_reward.quantity) = 0, NULL,        
-        	JSON_ARRAYAGG(message_reward.quantity)
+       COUNT(message_reward.quantity) = 0, NULL,        		
+       CONCAT('[',
+       GROUP_CONCAT(DISTINCT message_reward.quantity),
+         ']')
         )	reward
         
     FROM post_message
@@ -79,19 +88,20 @@ BEGIN
     
     LEFT JOIN
     
-    (SELECT
-     
+    (SELECT 
      message_reward.message_id message_id,
      
      	JSON_OBJECT(
          
-     		'all_count', COUNT(message_reward.message_id),
+     		'all_count',
+            COUNT(message_reward.message_id),
          
-     		'reward', message_reward.reward
+     		'reward',
+             message_reward.reward
             
      )	quantity
      
-     FROM message_reward
+     FROM message_reward 
      
      GROUP BY
      
@@ -109,10 +119,42 @@ BEGIN
     
     GROUP BY
     
-    post_message.id
+    post_message.id,
     
-    ORDER BY post_message.id ASC;
+    post_message.post_id
     
+    ORDER BY 
+    
+    post_message.id,
+    
+    post_message.post_id
+    
+    ASC;
+    
+END$$
+
+CREATE DEFINER=`root`@`127.0.0.1` PROCEDURE `sp_save_or_delete_post_in_id` (IN `post_id` INT(11), IN `user_id` INT)  NO SQL
+BEGIN
+SET @OUTPUT =
+	(SELECT case when  
+     COUNT(save_post.post) = 0 
+     THEN 'OK' ELSE 'ERROR' END OUTPUT
+	FROM save_post
+ 	WHERE save_post.post = post_id 
+ 	and save_post.user = user_id);
+
+    IF (@output = 'OK') THEN
+        INSERT INTO save_post
+        (save_post.post, save_post.user)
+        VALUES
+        (post_id, user_id);
+    ELSE
+        DELETE FROM save_post 
+        WHERE 
+        save_post.post = post_id
+        AND
+        save_post.user = user_id;
+    END IF;
 END$$
 
 DELIMITER ;
@@ -187,7 +229,8 @@ CREATE TABLE `n_message` (
 --
 
 INSERT INTO `n_message` (`id`, `message_id`, `n_message`) VALUES
-(1, 1, 2);
+(1, 1, 2),
+(2, 1, 3);
 
 -- --------------------------------------------------------
 
@@ -255,7 +298,8 @@ CREATE TABLE `post_message` (
 
 INSERT INTO `post_message` (`id`, `post_id`, `user_id`, `message`) VALUES
 (1, 1, 1, 'it\'s cool!'),
-(2, 1, 1, 'real:?');
+(2, 1, 1, 'real:?'),
+(3, 1, 1, 'test');
 
 -- --------------------------------------------------------
 
@@ -297,7 +341,8 @@ CREATE TABLE `p_message` (
 --
 
 INSERT INTO `p_message` (`id`, `message_id`, `p_message`) VALUES
-(1, 2, 1);
+(1, 2, 1),
+(2, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -319,6 +364,17 @@ CREATE TABLE `rewards` (
 INSERT INTO `rewards` (`id`, `name`, `user_id`, `img`) VALUES
 (3, 'cool', 1, 'cool.png'),
 (4, 'super', 1, 'super.png');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `save_post`
+--
+
+CREATE TABLE `save_post` (
+  `post` int NOT NULL,
+  `user` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -464,6 +520,13 @@ ALTER TABLE `rewards`
   ADD KEY `rewards_ibfk_1` (`user_id`);
 
 --
+-- Индексы таблицы `save_post`
+--
+ALTER TABLE `save_post`
+  ADD KEY `post` (`post`),
+  ADD KEY `user` (`user`);
+
+--
 -- Индексы таблицы `token`
 --
 ALTER TABLE `token`
@@ -502,7 +565,7 @@ ALTER TABLE `group_reddit`
 -- AUTO_INCREMENT для таблицы `n_message`
 --
 ALTER TABLE `n_message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `post`
@@ -520,13 +583,13 @@ ALTER TABLE `post_img`
 -- AUTO_INCREMENT для таблицы `post_message`
 --
 ALTER TABLE `post_message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `p_message`
 --
 ALTER TABLE `p_message`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `rewards`
@@ -629,6 +692,13 @@ ALTER TABLE `p_message`
 --
 ALTER TABLE `rewards`
   ADD CONSTRAINT `rewards_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `save_post`
+--
+ALTER TABLE `save_post`
+  ADD CONSTRAINT `save_post_ibfk_1` FOREIGN KEY (`post`) REFERENCES `post` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `save_post_ibfk_2` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `token`
