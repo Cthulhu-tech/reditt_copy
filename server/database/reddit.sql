@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Авг 23 2022 г., 11:54
+-- Время создания: Авг 23 2022 г., 13:15
 -- Версия сервера: 8.0.30-0ubuntu0.20.04.2
 -- Версия PHP: 7.4.3
 
@@ -126,8 +126,18 @@ BEGIN
 
 END$$
 
-CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11))  NO SQL
+CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_all_message_in_post` (IN `value_post_id` INT(11), IN `user_name_value` CHAR(55))  NO SQL
 BEGIN
+
+     SET @user = (SELECT case when COUNT(user.id) = 1 
+      
+      THEN user.id ELSE 0 
+                
+      END USER_FIND FROM user 
+      
+      WHERE user.login = user_name_value
+      
+      GROUP BY user.id);
 
 	SELECT
     
@@ -156,8 +166,11 @@ BEGIN
          ']')
         )	reward,
         
-       IF(COUNT(message_like.message_id) = 0, 0,        		
-       SUM(DISTINCT message_like.value)) message_value
+       IF(COUNT(message_like.value) = 0, 0,        		
+       SUM(DISTINCT message_like.value)) message_value,
+       
+       IF(COUNT(user_like.value) = 0, 0,        		
+       GROUP_CONCAT(DISTINCT user_like.value)) user_rating
         
     FROM post_message
     
@@ -204,6 +217,13 @@ BEGIN
     
     ON message_like.message_id = post_message.id
     
+    LEFT JOIN message_like user_like
+    
+    ON 
+    	(user_like.user_id = @user
+    AND
+    	user_like.message_id = post_message.id)
+        
     WHERE
     
     post_message.post_id = value_post_id
@@ -224,8 +244,18 @@ BEGIN
     
 END$$
 
-CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_best_post` (IN `page` INT(11))  NO SQL
+CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_get_best_post` (IN `page` INT(11), IN `user_name_value` CHAR(55))  NO SQL
 BEGIN
+
+     SET @user = (SELECT case when COUNT(user.id) = 1 
+      
+      THEN user.id ELSE 0 
+                
+      END USER_FIND FROM user 
+      
+      WHERE user.login = user_name_value
+      
+      GROUP BY user.id);
 
 	SELECT
         
@@ -261,7 +291,10 @@ BEGIN
         )	reward,
         
        IF(COUNT(post_like.user_id) = 0, 0,        		
-       SUM(DISTINCT post_like.value)) post_value
+       SUM(DISTINCT post_like.value)) post_value,
+       
+       IF(COUNT(user_like.value) = 0, 0,        		
+       GROUP_CONCAT(DISTINCT user_like.value)) user_rating
         
     FROM post
     
@@ -306,6 +339,13 @@ BEGIN
     	post_reward
         
 	ON post_reward.post_id = post.id
+    
+    LEFT JOIN post_like user_like
+    
+    ON 
+    	(post_like.user_id = @user
+    AND
+    	post_like.post_title = post.title)
     
     GROUP BY
     
@@ -412,6 +452,41 @@ END IF;
 
 END$$
 
+CREATE DEFINER=`thrackerzod`@`localhost` PROCEDURE `sp_post_hidden` (IN `user_id_value` INT(11), IN `post_title_value` CHAR(55))  NO SQL
+BEGIN
+
+ SET @USER_FIND = (SELECT case when COUNT(user.id) = 1 THEN 'FIND' ELSE 'ERROR' 
+                END USER_FIND FROM user WHERE user.id = user_id_value);
+
+     
+IF (@USER_FIND = 'FIND') THEN
+
+    SET @OUTPUT =
+        (SELECT case when  
+         COUNT(hidden_post.user_id) = 0 
+         THEN 'OK' ELSE 'ERROR' END OUTPUT
+        FROM hidden_post
+        WHERE hidden_post.user_id = user_id_value 
+        and hidden_post.post_title = post_title_value);
+
+        IF (@output = 'OK') THEN
+            INSERT INTO hidden_post
+            (hidden_post.user_id, 
+             hidden_post.post_title)
+            VALUES
+            (user_id_value, 
+             post_title_value);
+        ELSE
+            DELETE FROM hidden_post 
+            WHERE 
+            hidden_post.user_id = user_id_value
+            AND
+            hidden_post.post_title = post_title_value;
+        END IF;
+END IF;
+
+END$$
+
 CREATE DEFINER=`root`@`127.0.0.1` PROCEDURE `sp_save_or_delete_post_in_id` (IN `post_id` INT(11), IN `user_id` INT)  NO SQL
 BEGIN
 SET @OUTPUT =
@@ -499,6 +574,17 @@ CREATE TABLE `group_reddit` (
 
 INSERT INTO `group_reddit` (`id`, `avatars`, `title`, `description`, `background`) VALUES
 (1, 'fake-reddit-avatars.png', 'fake_reddit', 'wow! it\'s fake reddit.', 'fake-reddit.png');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `hidden_post`
+--
+
+CREATE TABLE `hidden_post` (
+  `user_id` int NOT NULL,
+  `post_title` char(55) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -617,6 +703,13 @@ CREATE TABLE `post_like` (
   `post_title` char(55) NOT NULL,
   `value` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `post_like`
+--
+
+INSERT INTO `post_like` (`user_id`, `post_title`, `value`) VALUES
+(1, 'test', 1);
 
 -- --------------------------------------------------------
 
@@ -795,6 +888,13 @@ CREATE TABLE `user_message` (
 ALTER TABLE `group_reddit`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
+
+--
+-- Индексы таблицы `hidden_post`
+--
+ALTER TABLE `hidden_post`
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `post_title` (`post_title`);
 
 --
 -- Индексы таблицы `message_like`
@@ -981,6 +1081,13 @@ ALTER TABLE `user_message`
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
+
+--
+-- Ограничения внешнего ключа таблицы `hidden_post`
+--
+ALTER TABLE `hidden_post`
+  ADD CONSTRAINT `hidden_post_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `hidden_post_ibfk_2` FOREIGN KEY (`post_title`) REFERENCES `post` (`title`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `message_like`
