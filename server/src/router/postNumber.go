@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	jwt_server "github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/jwt"
 	"github.com/Cthulhu-tech/reditt_copy/tree/master/server/src/utils/mysql"
 	"github.com/gorilla/mux"
 )
@@ -17,7 +18,15 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 
 	var db = mysql.GetDB()
 
-	rows, err := db.Query("CALL sp_get_all_message_in_post(?)", id)
+	valid, user := jwt_server.CheckToken(r)
+
+	if !valid {
+
+		user = ""
+
+	}
+
+	rows, err := db.Query("CALL sp_get_all_message_in_post(?, ?)", id, user)
 
 	if err != nil {
 
@@ -31,7 +40,7 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 
 		var post PostData
 
-		if err := rows.Scan(&post.Message_ID, &post.User, &post.Message, &post.Prev, &post.Next, &post.Reward, &post.Value); err != nil {
+		if err := rows.Scan(&post.Message_ID, &post.User, &post.Message, &post.Prev, &post.Next, &post.Reward, &post.Value, &post.Rating); err != nil {
 
 			log.Println(err.Error())
 
@@ -43,6 +52,7 @@ func postNumber(w http.ResponseWriter, r *http.Request) {
 		convertPostData.User = post.User
 		convertPostData.Message = post.Message.String
 		convertPostData.Value = post.Value.Int64
+		convertPostData.Rating = post.Rating.Int64
 
 		var arrayNumber []int
 

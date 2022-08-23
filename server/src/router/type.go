@@ -12,6 +12,7 @@ type PostData struct {
 	Next       sql.NullString `json:"next_message"`
 	Reward     sql.NullString `json:"reward"`
 	Value      sql.NullInt64  `json:"message_value"`
+	Rating     sql.NullInt64  `json:"message_value"`
 }
 
 type PostDataConvert struct {
@@ -22,6 +23,7 @@ type PostDataConvert struct {
 	Next       []int    `json:"next_message"`
 	Reward     []Reward `json:"reward"`
 	Value      int64    `json:"message_value"`
+	Rating     int64    `json:"user_rating"`
 }
 
 type Reward struct {
