@@ -1,13 +1,15 @@
 package jwt_server
 
 import (
+	"errors"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-func GetToken(r *http.Request) (*http.Cookie, error) {
+func GetRefreshToken(r *http.Request) (*http.Cookie, error) {
 
 	cookie, err := r.Cookie("refresh")
 
@@ -15,19 +17,11 @@ func GetToken(r *http.Request) (*http.Cookie, error) {
 
 }
 
-func CheckToken(r *http.Request) (bool, string) {
+func CheckToken(r *http.Request, tokenValue string) (bool, string) {
 
 	claims := jwt.MapClaims{}
 
-	cookie, err := GetToken(r)
-
-	if err != nil {
-
-		return false, ""
-
-	}
-
-	_token, _ := jwt.ParseWithClaims(cookie.Value, claims, func(token *jwt.Token) (interface{}, error) {
+	_token, _ := jwt.ParseWithClaims(tokenValue, claims, func(token *jwt.Token) (interface{}, error) {
 
 		return []byte(os.Getenv("JWT_SECRET")), nil
 
@@ -42,6 +36,26 @@ func CheckToken(r *http.Request) (bool, string) {
 	} else {
 
 		return false, ""
+
+	}
+
+}
+
+func GetBearerToken(r *http.Request) (string, error) {
+
+	reqToken := r.Header.Get("Authorization")
+
+	splitToken := strings.Split(reqToken, "Bearer ")
+
+	reqToken = splitToken[1]
+
+	if len(splitToken) != 2 {
+
+		return "", errors.New("unavailable")
+
+	} else {
+
+		return reqToken, nil
 
 	}
 
