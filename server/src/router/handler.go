@@ -18,6 +18,13 @@ func HandlerRouter() {
 	jwtHandler := router.PathPrefix("/").Subrouter()
 
 	jwtHandler.HandleFunc("/post/create", userPost.UserCreatePost).Methods("POST")
+	jwtHandler.HandleFunc("/post/hidden", userPost.UserHiddenPost).Methods("POST")
+
+	jwtHandler.HandleFunc("/likeMessage", userPost.UserLikeMessage).Methods("POST")
+	jwtHandler.HandleFunc("/dislikeMessage", userPost.UserDislikeMessage).Methods("POST")
+
+	jwtHandler.HandleFunc("/likePost", userPost.UserLikePost).Methods("POST")
+	jwtHandler.HandleFunc("/dislikePost", userPost.UserDislikePost).Methods("POST")
 
 	jwtHandler.HandleFunc("/saved/update", userPost.UserSaved).Methods("POST")
 	jwtHandler.HandleFunc("/delete/update", userPost.UserDelete).Methods("POST")
