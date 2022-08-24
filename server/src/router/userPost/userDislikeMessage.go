@@ -32,13 +32,13 @@ func UserDislikeMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userInfo BodyDataLikeOrDislike
+	var idMessage BodyDataLikeOrDislike
 
-	err = json.Unmarshal(body, &userInfo)
+	err = json.Unmarshal(body, &idMessage)
 
 	var db = mysql.GetDB()
 
-	rows, err := db.Query(`sp_dislike_post(?, ?)`, userId, userInfo.Id)
+	rows, err := db.Query(`sp_dislike_message(?, ?)`, userId, idMessage.Id)
 
 	defer rows.Close()
 
