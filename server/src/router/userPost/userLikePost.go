@@ -7,6 +7,6 @@ import (
 
 func UserLikePost(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Fprint(w, "user like post")
+	fmt.Fprint(w, "user like message")
 
 }

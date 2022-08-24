@@ -17,6 +17,8 @@ func HandlerRouter() {
 
 	jwtHandler := router.PathPrefix("/").Subrouter()
 
+	//
+
 	jwtHandler.HandleFunc("/post/create", userPost.UserCreatePost).Methods("POST")
 	jwtHandler.HandleFunc("/post/hidden", userPost.UserHiddenPost).Methods("POST")
 
@@ -35,6 +37,8 @@ func HandlerRouter() {
 	jwtHandler.HandleFunc("/comments/update", userPost.UserComments).Methods("POST")
 	jwtHandler.HandleFunc("/submited/update", userPost.UserSubmited).Methods("POST")
 	jwtHandler.HandleFunc("/downvoted/update", userPost.UserDownvoted).Methods("POST")
+
+	//
 
 	router.HandleFunc("/login", login).Methods("POST")               // end
 	router.HandleFunc("/lagout", lagout).Methods("POST")             // end
